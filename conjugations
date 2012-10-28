@@ -1,0 +1,20 @@
+
+nennen = [
+present = {
+ ich :nenne
+ du  :nennst
+ er  :nennt
+ wir :nennen
+ ihr :nennt
+ sie :nennen
+}
+perfect = {
+ich :habe genannt
+du  :hast genannt
+er  :hat genannt
+wir :haben genannt
+ihr :habt genannt
+sie :haben genannt
+}
+]
+
