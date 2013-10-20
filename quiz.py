@@ -18,31 +18,51 @@ sys.stdin = ustdio(sys.stdin)
 
 class Question:
 
-    def __init__(self, question, answer, prompt = None):
+    def __init__(self, question, answers, prompt, hint = None):
         self.question = question
-        if prompt:
-            repl = "_" * len(answer)
-            self.prompt = prompt.replace(" _ ", " %s " % repl)
-        else:
-            self.prompt = ""
-        self.answer = answer
+        self.hint = hint
+        self.answers = answers
+        self.prompt = prompt
 
     def query(self):
-        print self.question
-        if self.prompt:
-            print self.prompt
+        print self.question, self.prompt,
+        if self.hint:
+            print ":", self.hint
+        else:
+            print ""
         resp = raw_input(":")
-        if resp == self.answer:
+        if resp in self.answers:
             print "Genau!\n"
         else:
             print "Nein!"
-            print self.answer
+            print " OR ".join(self.answers)
             print ""
 
 class Translation(Question):
     
-    def __init__(self, word, translation):
-        Question.__init__(self, "Translate", translation, word)
+    def __init__(self, word, translations, hint):
+        Question.__init__(self, "Translate", translations, word, hint)
+
+class ForeignTranslation(Translation):
+
+    def __init__(self, word, translations, hint):
+        hint = hint.replace("#", "")
+        print word, translations, hint
+        Question.__init__(self, "Translate", translations, word, hint)
+
+class NativeTranslation(Translation):
+
+    def __init__(self, word, translations, hint):
+        if hint:
+            str_arr = hint.split("#")
+            repl = "_" * (len(str_arr[1]))
+            str_arr[1] = repl
+            hint = "".join(str_arr)
+            Question.__init__(self, "Translate", translations, word, hint)
+        else:
+            print word, translations, hint
+            Question.__init__(self, "Translate", translations, word, hint)
+
 
 class Quiz:
     
@@ -56,11 +76,13 @@ class Quiz:
         q = Question(question, answer, prompt)
         self.append(q)
 
-    def translation(self, word, translation):
-        t = Translation(word, translation)
+    def translation(self, word, translation, example):
+        translations = map(strip, translation.split(","))
+        t = ForeignTranslation(word, translations, example)
         self.append(t)
-        t = Translation(translation, word)
-        self.append(t)
+        for tr in translations:
+            t = NativeTranslation(translation, [word], example)
+            self.append(t)
 
     def add_tense(self, verb, tense, text):
         for line in text.strip().splitlines():
@@ -87,8 +109,13 @@ class Quiz:
         f = codecs.open(path, "r", "utf-8")
         text = f.read().strip()
         for line in text.splitlines():
-            w1, w2 = line.split(":")
-            self.translation(w1.strip(), w2.strip())
+            splitter = line.split(":")
+            if len(splitter) == 2:
+                word, answers = map(strip, splitter)
+                self.translation(word=word, translation=answers, example="")
+            else:
+                word, answers, example = map(strip, splitter)
+                self.translation(word=word, translation=answers, example=example)
 
     def start(self):
         import random
@@ -100,8 +127,8 @@ class Quiz:
 
 if __name__ == "__main__":
     quiz = Quiz()
-    #quiz.add_translations("translations")
-    quiz.add_verbs("conjugations")
+    quiz.add_translations("translations")
+    #quiz.add_verbs("conjugations")
     quiz.start()
     for q in quiz:
         q.query()
