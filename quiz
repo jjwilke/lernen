@@ -1,5 +1,9 @@
+#! /usr/bin/env python
+
 # -*- coding: utf-8 -*-
 
+import os
+import os.path
 import sys
 import re
 import codecs
@@ -47,7 +51,7 @@ class ForeignTranslation(Translation):
 
     def __init__(self, word, translations, hint):
         hint = hint.replace("#", "")
-        print word, translations, hint
+        #print word, translations, hint
         Question.__init__(self, "Translate", translations, word, hint)
 
 class NativeTranslation(Translation):
@@ -60,7 +64,7 @@ class NativeTranslation(Translation):
             hint = "".join(str_arr)
             Question.__init__(self, "Translate", translations, word, hint)
         else:
-            print word, translations, hint
+            #print word, translations, hint
             Question.__init__(self, "Translate", translations, word, hint)
 
 
@@ -126,9 +130,18 @@ class Quiz:
 
 
 if __name__ == "__main__":
+    language = sys.argv[1]
+    quiztype = sys.argv[2]
     quiz = Quiz()
-    quiz.add_translations("translations")
-    #quiz.add_verbs("conjugations")
+    if quiztype == "verbs":
+        language_file = os.path.join(language, "conjugations")
+        quiz.add_verbs(language_file)
+    elif quiztype == "slang":
+        language_file = os.path.join(language, "slang")
+        quiz.add_translations(language_file)
+    elif quiztype == "vocab":
+        language_file = os.path.join(language, "translations")
+        quiz.add_translations(language_file)
     quiz.start()
     for q in quiz:
         q.query()
