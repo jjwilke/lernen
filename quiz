@@ -59,7 +59,11 @@ class NativeTranslation(Translation):
     def __init__(self, word, translations, hint):
         if hint:
             str_arr = hint.split("#")
-            repl = "_" * (len(str_arr[1]))
+            try:
+                repl = "_" * (len(str_arr[1]))
+            except IndexError:
+                print word, translations, hint
+                sys.exit("Improper format")
             str_arr[1] = repl
             hint = "".join(str_arr)
             Question.__init__(self, "Translate", translations, word, hint)
@@ -108,7 +112,6 @@ class Quiz:
         for verb, text in verbs:
             self.add_verb(verb, text)
 
-
     def add_translations(self, path):
         f = codecs.open(path, "r", "utf-8")
         text = f.read().strip()
@@ -133,15 +136,8 @@ if __name__ == "__main__":
     language = sys.argv[1]
     quiztype = sys.argv[2]
     quiz = Quiz()
-    if quiztype == "verbs":
-        language_file = os.path.join(language, "conjugations")
-        quiz.add_verbs(language_file)
-    elif quiztype == "slang":
-        language_file = os.path.join(language, "slang")
-        quiz.add_translations(language_file)
-    elif quiztype == "vocab":
-        language_file = os.path.join(language, "translations")
-        quiz.add_translations(language_file)
+    language_file = os.path.join(language, quiztype)
+    quiz.add_verbs(language_file)
     quiz.start()
     for q in quiz:
         q.query()
