@@ -38,6 +38,8 @@ class Question:
         if resp in self.answers:
             print "Genau! %s\n" % " or ".join(self.answers)
             return True
+        elif resp == "n/a": 
+            return True
         else:
             print "Nein!"
             print " or ".join(self.answers)
