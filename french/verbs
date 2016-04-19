@@ -1,0 +1,35 @@
+
+écrire = [
+present = {
+ je  : écris
+ tu  : écris
+ il  : écrit
+ nous: écrivons
+ nous: êcrivez
+ ils : écrivent
+}
+]
+
+étre = [
+present = {
+ je  : suis
+ tu  : es
+ il  : est
+ vous: êtes
+ nous: sommes
+ ils : sont
+}
+]
+
+avoir = [
+present = {
+ je  : ai
+ tu  : as
+ il  : a
+ vous: avons
+ nous: avez
+ ils : ont
+}
+]
+
+

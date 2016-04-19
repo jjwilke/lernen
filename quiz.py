@@ -36,11 +36,15 @@ class Question:
             print ""
         resp = raw_input(":")
         if resp in self.answers:
-            print "Genau!\n"
+            print "Genau! %s\n" % " or ".join(self.answers)
+            return True
+        elif resp == "n/a": 
+            return True
         else:
             print "Nein!"
-            print " OR ".join(self.answers)
+            print " or ".join(self.answers)
             print ""
+            return False
 
 class Translation(Question):
     
@@ -86,11 +90,14 @@ class Quiz:
 
     def translation(self, word, translation, example):
         translations = map(strip, translation.split(","))
-        t = ForeignTranslation(word, translations, example)
+        words = map(strip, word.split(","))
+        for w in words:
+          t = ForeignTranslation(w, translations, example)
+          self.append(t)
+
+        translation = " or ".join(translations)
+        t = NativeTranslation(translation, words, example)
         self.append(t)
-        for tr in translations:
-            t = NativeTranslation(translation, [word], example)
-            self.append(t)
 
     def add_tense(self, verb, tense, text):
         for line in text.strip().splitlines():
@@ -133,14 +140,19 @@ class Quiz:
 
 
 if __name__ == "__main__":
-    language = sys.argv[1]
-    quiztype = sys.argv[2]
+    path = sys.argv[1]
     quiz = Quiz()
-    language_file = os.path.join(language, quiztype)
-    quiz.add_verbs(language_file)
+    quiz.add_translations(path)
     quiz.start()
-    for q in quiz:
-        q.query()
+    questions = quiz.questions
+    while questions:
+      wrongAnswers = []
+      for q in questions:
+          correct = q.query()
+          if not correct:
+            wrongAnswers.append(q)
+      questions = wrongAnswers
+
         
 
 
