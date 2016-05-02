@@ -7,6 +7,9 @@ import os.path
 import sys
 import re
 import codecs
+import numpy
+
+numpy.random.seed()
 
 def strip(x):
     return x.strip()
@@ -27,6 +30,12 @@ class Question:
         self.hint = hint
         self.answers = answers
         self.prompt = prompt
+        self.tag = numpy.random.rand()
+
+    def __lt__(self, other):
+      if not self.ty == other.ty: 
+        return self.ty < other.ty
+      return self.tag < other.tag
 
     def query(self):
         print self.question, self.prompt,
@@ -47,9 +56,11 @@ class Question:
             return False
 
 class Translation(Question):
-    
+    Foreign = 1
+    Native = 0
     def __init__(self, word, translations, hint):
         Question.__init__(self, "Translate", translations, word, hint)
+
 
 class ForeignTranslation(Translation):
 
@@ -57,10 +68,12 @@ class ForeignTranslation(Translation):
         hint = hint.replace("#", "")
         #print word, translations, hint
         Question.__init__(self, "Translate", translations, word, hint)
+        self.ty = self.Foreign
 
 class NativeTranslation(Translation):
 
     def __init__(self, word, translations, hint):
+        self.ty = self.Native
         if hint:
             str_arr = hint.split("#")
             try:
@@ -132,8 +145,7 @@ class Quiz:
                 self.translation(word=word, translation=answers, example=example)
 
     def start(self):
-        import random
-        random.shuffle(self.questions)
+      self.questions.sort()
 
     def __iter__(self):
         return iter(self.questions)
@@ -152,6 +164,7 @@ if __name__ == "__main__":
           if not correct:
             wrongAnswers.append(q)
       questions = wrongAnswers
+      questions.sort()
 
         
 
